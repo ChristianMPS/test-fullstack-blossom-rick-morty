@@ -1,7 +1,7 @@
 import { Model, DataTypes } from "sequelize";
 import sequelize from "../config/database";
-
-
+import Origin from "./origin";
+import Location from "./location";
 
 export class Character extends Model {
   public id!: number;
@@ -10,31 +10,54 @@ export class Character extends Model {
   public species!: string;
   public type!: string;
   public gender!: string;
-  public origin!: Record<string, any>;
-  public location!: Record<string, any>;
   public image!: string;
   public episode!: string[];
   public created!: string;
+  public originId!: number;
+  public locationId!: number;
 }
 
 Character.init(
   {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
+    },
     name: DataTypes.STRING,
     status: DataTypes.STRING,
     species: DataTypes.STRING,
     type: DataTypes.STRING,
     gender: DataTypes.STRING,
-    origin: DataTypes.JSON,
-    location: DataTypes.JSON,
     image: DataTypes.STRING,
-    episode: DataTypes.JSON,
+    episode: DataTypes.JSONB,
     created: DataTypes.STRING,
   },
   {
     sequelize,
     modelName: "Character",
-    tableName: "Characters",
+    tableName: "characters",
+    timestamps: false,
   }
 );
+
+
+Character.belongsTo(Origin, {
+  foreignKey: "originId",
+  as: "origin",
+});
+
+Character.belongsTo(Location, {
+  foreignKey: "locationId",
+  as: "location",
+});
+
+Origin.hasMany(Character, {
+  foreignKey: "originId",
+});
+
+Location.hasMany(Character, {
+  foreignKey: "locationId",
+});
 
 export default Character;
