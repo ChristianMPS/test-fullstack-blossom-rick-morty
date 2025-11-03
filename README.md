@@ -134,7 +134,7 @@ Copy the Direct Connection URL, which looks like this:
 postgresql://postgres.[project-id]:[password]@aws-1-us-east-1.pooler.supabase.com:5432/postgres
 
 Create a .env file in the root of your project and add:
-DATABASE_URL="your Supabase direct connection URL here"
+DATABASE_URL="your Supabase direct connection URL here" remember copy your password in the url and without "", DATABASE_URL=your url
 
 5. 🌱 Seed the Database
 
