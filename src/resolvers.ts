@@ -2,29 +2,53 @@ import axios from "axios";
 
 const resolvers = {
   Query: {
-    characters: async (_: unknown, { name }: { name?: string }) => {
-      const { data } = await axios.get("https://rickandmortyapi.com/api/character", {
-        params: { name },
-      });
-      return data.results;
-    },
-  },
-  Character: {
-    origin: async (parent: any) => {
-      if (!parent.origin?.url) return null;
-      const { data } = await axios.get(parent.origin.url);
-      return data;
-    },
-    location: async (parent: any) => {
-      if (!parent.location?.url) return null;
-      const { data } = await axios.get(parent.location.url);
-      return data;
-    },
-    episode: async (parent: any) => {
-      const episodeUrls = parent.episode || [];
-      const requests = episodeUrls.map((url: string) => axios.get(url));
-      const responses = await Promise.all(requests);
-      return responses.map((r) => r.data);
+    characters: async (
+      _: unknown,
+      { name, status, species, gender, origin }: {
+        name?: string;
+        status?: string;
+        species?: string;
+        gender?: string;
+        origin?: string;
+      }
+    ) => {
+      try {
+        const params: any = {};
+
+        if (name) params.name = name;
+        if (status) params.status = status;
+        if (species) params.species = species;
+        if (gender) params.gender = gender;
+
+        // Petición a la API pública
+        const response = await axios.get("https://rickandmortyapi.com/api/character", { params });
+        let results = response.data.results;
+
+        // Filtrado adicional por origin (no soportado directamente por la API)
+        if (origin) {
+          results = results.filter((char: any) =>
+            char.origin?.name?.toLowerCase().includes(origin.toLowerCase())
+          );
+        }
+
+        // Mapear los episodios para devolver estructura completa
+        const charactersWithEpisodes = await Promise.all(
+          results.map(async (char: any) => {
+            const episodes = await Promise.all(
+              char.episode.map(async (epUrl: string) => {
+                const epData = await axios.get(epUrl);
+                return epData.data;
+              })
+            );
+            return { ...char, episode: episodes };
+          })
+        );
+
+        return charactersWithEpisodes;
+      } catch (error) {
+        console.error("Error fetching characters:", error);
+        return [];
+      }
     },
   },
 };

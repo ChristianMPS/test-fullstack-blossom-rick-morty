@@ -2,7 +2,13 @@ import { gql } from "graphql-tag";
 
 const typeDefs = gql`
   type Query {
-    characters(name: String): [Character]
+    characters(
+      name: String
+      status: String
+      species: String
+      gender: String
+      origin: String
+    ): [Character]
   }
 
   type Character {
