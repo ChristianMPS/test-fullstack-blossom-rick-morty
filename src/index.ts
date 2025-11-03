@@ -3,6 +3,7 @@ import cors from "cors";
 import bodyParser from "body-parser";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
+import { loggerMiddleware } from "./middleware/logger";
 
 import typeDefs from "./schema";
 import resolvers from "./resolvers";
@@ -12,6 +13,7 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
   app.use(bodyParser.json());
+  app.use(loggerMiddleware);
 
   const server = new ApolloServer({
     typeDefs,

@@ -20,18 +20,13 @@ const resolvers = {
         if (species) params.species = species;
         if (gender) params.gender = gender;
 
-        // Petición a la API pública
         const response = await axios.get("https://rickandmortyapi.com/api/character", { params });
         let results = response.data.results;
-
-        // Filtrado adicional por origin (no soportado directamente por la API)
         if (origin) {
           results = results.filter((char: any) =>
             char.origin?.name?.toLowerCase().includes(origin.toLowerCase())
           );
         }
-
-        // Mapear los episodios para devolver estructura completa
         const charactersWithEpisodes = await Promise.all(
           results.map(async (char: any) => {
             const episodes = await Promise.all(
